@@ -30,6 +30,8 @@ function withDB(callback) {
     // to be deleted and recreates those specified by objectStoreMap.
     var request = idb.open("MeteorDynamicImportCache", 2);
 
+    console.log('XXX: Request created');
+
     request.onupgradeneeded = function (event) {
       var db = event.target.result;
 
@@ -44,7 +46,14 @@ function withDB(callback) {
     };
 
     request.onerror = makeOnError(reject, "indexedDB.open");
+    const handle = setTimeout(() => {
+      // we could reject here
+      // reject(new Error('IndexedDB request timeout'));
+      console.log('XXX: Request hasn\'t resolved in 1s. We should reject here and our app will continue loading.');
+    }, 1000)
     request.onsuccess = function (event) {
+      console.log('XXX: request was successful');
+      clearTimeout(handle);
       resolve(event.target.result);
     };
   });
